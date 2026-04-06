@@ -3,6 +3,7 @@ const { userModel } = require('../db')
 const bcrypt = require('bcrypt')
 const Jwt = require("jsonwebtoken");
 
+
 const userRouter = Router();
 
 userRouter.post('/register', async (req, res) => {
@@ -12,8 +13,12 @@ userRouter.post('/register', async (req, res) => {
         if (!email || !password || !firstname || !lastname) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ success: false, message: "Email already registered" });
+        }
         const hashedpassword = await bcrypt.hash(password, 10);
-        const user = userModel.create({
+        const user = await userModel.create({
             email, password: hashedpassword, firstname, lastname
         });
         res.status(201).json({
@@ -39,8 +44,14 @@ userRouter.post('/login', async (req, res) => {
             return res.status(400).json({ success: false, message: "invalid email or password" })
         }
 
-    const token = Jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-        res.status(200).json({ success: true, message: "login successful", token });
+        const token = Jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {});
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: 'strict',                   // CSRF protection
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+
+        })
+        res.status(200).json({ success: true, message: "login successful" });
     } catch (error) {
         res.status(500).json({ success: false, message: "error occurred while logging in" })
     }

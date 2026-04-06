@@ -1,22 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { userRouter} = require('./routes/user');
-require('dotenv').config();
-const app = express();
+const cookieParser = require('cookie-parser');
 
-// Add this before routes
+
+const { userRouter } = require('./routes/user');
+require('dotenv').config();
+
+
+
+const app = express();
+app.use(cookieParser());
+
 app.use(express.json());
 
 // DB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => {
-    console.error('DB connection failed:', err.message);
-    process.exit(1);
-  });
+    .then(() => console.log('MongoDB connected'))
+    .catch((err) => {
+        console.error('DB connection failed:', err.message);
+        process.exit(1);
+    });
 app.use('/api/users', userRouter);
 
-app.get('/', ( req, res ) => {
+app.get('/', (req, res) => {
     res.json({
         message: 'server running'
     })
