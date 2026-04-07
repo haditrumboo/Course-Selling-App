@@ -1,5 +1,6 @@
 const { Router } = require('express');
-const { adminModel } = require('../db')
+const { adminModel, courseModel } = require('../db')
+const { adminmiddleware } = require('../middleware/admin')
 const bcrypt = require('bcrypt')
 const Jwt = require("jsonwebtoken");
 
@@ -8,9 +9,9 @@ const adminRouter = Router();
 
 adminRouter.post('/register', async (req, res) => {
     try {
-        const { email, password, firstname, lastname } = req.body;
+        const { email, password, firstName, lastName } = req.body;
 
-        if (!email || !password || !firstname || !lastname) {
+        if (!email || !password || !firstName || !lastName) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
         const existingAdmin = await adminModel.findOne({ email });
@@ -19,7 +20,7 @@ adminRouter.post('/register', async (req, res) => {
         }
         const hashedpassword = await bcrypt.hash(password, 10);
         const user = await adminModel.create({
-            email, password: hashedpassword, firstname, lastname
+            email, password: hashedpassword, firstName, lastName
         });
         res.status(201).json({
             message: "admin created successfully"
@@ -44,7 +45,7 @@ adminRouter.post('/login', async (req, res) => {
             return res.status(400).json({ success: false, message: "invalid email or password" })
         }
 
-        const token = Jwt.sign({ userId: user._id }, process.env.JWT_SECRET1, {});
+        const token = Jwt.sign({ adminId: user._id }, process.env.JWT_ADMIN_SECRET1, { expiresIn: "7d"});
         res.cookie("token", token, {
             httpOnly: true,
             sameSite: 'strict',                   // CSRF protection
@@ -58,5 +59,25 @@ adminRouter.post('/login', async (req, res) => {
 
 })
 
-module.exports = { adminRouter };
+adminRouter.post("/create-course", adminmiddleware, async (req, res) => {
+    try {
+   const adminId = req.adminId;
+    const { title, description, price, imageUrl, creatorId } = req.body;
 
+    const course = await courseModel.create({
+        title, 
+        description,
+        price,
+        imageUrl,
+        creatorId: adminId
+    })
+res.status(201).json({ success: true, message: 'course created successfully',
+    courseId: course._id
+})
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: 'error creating course' })
+    }
+
+})
+module.exports = { adminRouter }

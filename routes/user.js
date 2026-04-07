@@ -8,9 +8,9 @@ const userRouter = Router();
 
 userRouter.post('/register', async (req, res) => {
     try {
-        const { email, password, firstname, lastname } = req.body;
+        const { email, password, firstName, lastName } = req.body;
 
-        if (!email || !password || !firstname || !lastname) {
+        if (!email || !password || !firstName || !lastName) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
         const existingUser = await userModel.findOne({ email });
@@ -19,7 +19,7 @@ userRouter.post('/register', async (req, res) => {
         }
         const hashedpassword = await bcrypt.hash(password, 10);
         const user = await userModel.create({
-            email, password: hashedpassword, firstname, lastname
+            email, password: hashedpassword, firstName, lastName
         });
         res.status(201).json({
             message: "user created successfully"

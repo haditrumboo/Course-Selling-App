@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGODB_URI)
         process.exit(1);
     });
 app.use('/api/users', userRouter);
-app.use('/api/admin', adminRouter)
+app.use('/api/admin', adminRouter);
 
 app.get('/', (req, res) => {
     res.json({
