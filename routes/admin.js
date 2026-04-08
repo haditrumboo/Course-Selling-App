@@ -93,7 +93,7 @@ adminRouter.put("/edit-course/:courseId", adminmiddleware, async (req, res) => {
         const updatedCourse = await courseModel.findOneAndUpdate(
             { _id: courseId, creatorId: adminId },
             { title, description, price },
-             { returnDocument: 'after' }
+            { returnDocument: 'after' }
         );
 
         if (!updatedCourse) {
@@ -108,7 +108,17 @@ adminRouter.put("/edit-course/:courseId", adminmiddleware, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ success: false, message: 'error updating course', error: error.message})
+        res.status(500).json({ success: false, message: 'error updating course', error: error.message })
     }
+})
+adminRouter.get("/courses", adminmiddleware, async (req, res) => {
+    try {
+        const adminId = req.adminId;
+        const courses = await courseModel.find({ creatorId: adminId });
+        res.status(200).json({ success: true, courses });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'error fetching courses', error: error.message });
+    }
+   
 })
 module.exports = { adminRouter }
