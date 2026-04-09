@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { userRouter } = require('./routes/user');
 const { adminRouter } = require('./routes/admin');
+const { courseRouter } = require('./routes/course')
 require('dotenv').config();
 
 const app = express();
@@ -19,6 +20,7 @@ mongoose.connect(process.env.MONGODB_URI)
     });
 app.use('/api/users', userRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/courses', courseRouter);
 
 app.get('/', (req, res) => {
     res.json({
