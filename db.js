@@ -28,7 +28,14 @@ const courseSchema = new Schema({
     price: Number,
     imageUrl: String,
     creatorId: ObjectId,
-});
+    content: [
+        {
+            title: String,
+            videoUrl: String,
+        }
+    ]
+},{ timestamps: true});
+
 
 // Define the Purchase schema with userId and courseId fields
 const purchaseSchema = new Schema({

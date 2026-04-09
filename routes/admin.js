@@ -62,21 +62,26 @@ adminRouter.post('/login', async (req, res) => {
 adminRouter.post("/create-course", adminmiddleware, async (req, res) => {
     try {
         const adminId = req.adminId;
-        const { title, description, price, imageUrl, creatorId } = req.body;
+        const { title, description, price, imageUrl, creatorId, content} = req.body;
+        if (!title || !description || !price || !imageUrl) {
+            return res.status(400).json({ success : false, message: "all fields are required"})
+        }
 
         const course = await courseModel.create({
             title,
             description,
             price,
             imageUrl,
-            creatorId: adminId
-        })
+            creatorId: adminId,
+            content: content || []
+        });
         res.status(201).json({
             success: true, message: 'course created successfully',
             courseId: course._id
         })
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ success: false, message: 'error creating course' })
     }
 
