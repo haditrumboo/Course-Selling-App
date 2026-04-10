@@ -42,15 +42,16 @@ courseRouter.post("/purchase/:courseId", usermiddleware, async (req, res) => {
 
 courseRouter.get("/preview-courses",  async (req, res) => {
     try {
-        const userId = req.userId;
-        const allcourses = await courseModel.find({});
+        const allcourses = await courseModel.find({},
+            'title description price imageUrl '
+        );
         res.status(200).json({
             success: true,
             courses: allcourses
         })
     } catch (error) {
         res.status(500).json({ success : false,
-            message: " error previewing courses",
+            message: " error fetching courses",
             error: error.message
         })
     }
