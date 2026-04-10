@@ -1,7 +1,8 @@
 const { Router } = require('express');
-const { userModel } = require('../db')
+const { userModel, purchaseModel } = require('../db')
 const bcrypt = require('bcrypt')
 const Jwt = require("jsonwebtoken");
+const { usermiddleware } = require('../middleware/user');
 
 
 const userRouter = Router();
@@ -57,6 +58,19 @@ userRouter.post('/login', async (req, res) => {
     }
 
 })
+userRouter.post('/purchased-courses', usermiddleware, async (req, res) => {
+    try {
+         const userId = req.userId;
+         const purchasedCourses = await purchaseModel.find({ userId }).populate('courseId');
+         res.status(200).json({
+            success: true,
+            courses: purchasedCourses
+
+         })
+        } catch (error) {
+            res.status(500).json({ success: false, message: "error fetching purchased courses",error: error.message })
+        }
+    })
 
 module.exports = { userRouter };
 

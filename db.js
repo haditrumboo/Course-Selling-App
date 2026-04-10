@@ -40,7 +40,7 @@ const courseSchema = new Schema({
 // Define the Purchase schema with userId and courseId fields
 const purchaseSchema = new Schema({
     userId: ObjectId,
-    courseId: ObjectId,
+    courseId: { type: ObjectId,  ref: 'course'}
 });
 
 // Create models for User, Admin, Course, and Purchase using the respective schemas
