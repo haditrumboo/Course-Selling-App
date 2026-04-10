@@ -56,4 +56,28 @@ courseRouter.get("/preview-courses",  async (req, res) => {
         })
     }
 })
+courseRouter.post("/particular-course/:courseId", async (req, res) => {
+ try {
+    const courseId = req.params.courseId;
+    const course = await courseModel.findById(courseId, 
+        'title description price imageUrl'
+    );
+    if (!course) {
+        res.status(404).json({
+            success: false,
+            message: "course not found"
+        })
+    }
+    res.status(200).json({
+        sucess: true,
+        course
+    })
+ }
+ catch (error) {
+    res.status(500).json9({ sucess: false,
+        message: "error fetching course",
+        error: error.message
+    })
+ }
+})
 module.exports = { courseRouter };
