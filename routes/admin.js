@@ -56,7 +56,20 @@ adminRouter.post('/login', async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: "error occurred while logging in" })
     }
-
+})
+adminRouter.post('/logout', adminmiddleware, async (req ,res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: 'strict',
+      });
+      res.status(200).json( { success:true, message: "logout sucessful"})
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: "error occurred while logging out", 
+            error: error.message
+        })
+    }
 })
 
 adminRouter.post("/create-course", adminmiddleware, async (req, res) => {

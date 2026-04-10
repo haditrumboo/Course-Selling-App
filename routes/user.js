@@ -58,6 +58,21 @@ userRouter.post('/login', async (req, res) => {
     }
 
 })
+userRouter.post('/logout', usermiddleware, async (req ,res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: 'strict',
+      });
+      res.status(200).json( { success:true, message: "logout sucessful"})
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: "error occurred while logging out", 
+            error: error.message
+        })
+    }
+})
+
 userRouter.post('/purchased-courses', usermiddleware, async (req, res) => {
     try {
          const userId = req.userId;
