@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const { userRouter } = require('./routes/user');
 const { adminRouter } = require('./routes/admin');
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(morgan('dev'));
 
 
 // DB Connection
