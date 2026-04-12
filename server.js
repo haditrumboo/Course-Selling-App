@@ -39,4 +39,4 @@ app.get('/', (req, res) => {
         message: 'server running'
     })
 })
-app.listen(3000);
+app.listen(process.env.port);
