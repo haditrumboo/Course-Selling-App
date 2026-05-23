@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { userRouter } = require('./routes/user');
 const { adminRouter } = require('./routes/admin');
@@ -9,8 +10,13 @@ const { limiter, authLimiter } = require('./middleware/rateLimter')
 
 require('dotenv').config();
 
-const app = express();
 
+
+const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,          // required — cookies are used for auth
+}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan('dev'));
