@@ -40,22 +40,26 @@ courseRouter.post("/purchase/:courseId", usermiddleware, async (req, res) => {
 })
 
 
-courseRouter.get("/preview-courses",  async (req, res) => {
-    try {
-        const allcourses = await resourceModel.find({},
-            'title description price imageUrl '
-        );
-        res.status(200).json({
-            success: true,
-            courses: allcourses
-        })
-    } catch (error) {
-        res.status(500).json({ success : false,
-            message: " error fetching courses",
-            error: error.message
-        })
-    }
-})
+courseRouter.get("/preview-courses", async (req, res) => {
+  try {
+    const [resources, paidCourses] = await Promise.all([
+      resourceModel.find({}, 'title description imageUrl type videoUrl externalUrl tags platform'),
+      courseModel.find({}, 'title description price imageUrl content tags creatorId'),
+    ]);
+
+    
+    const paid = paidCourses.map(c => ({
+      ...c.toObject(),
+      type: "paid",
+    }));
+
+    const all = [...resources, ...paid];
+
+    res.status(200).json({ success: true, courses: all });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "error fetching courses" });
+  }
+});
 courseRouter.post("/particular-course/:courseId", async (req, res) => {
  try {
     const courseId = req.params.courseId;
