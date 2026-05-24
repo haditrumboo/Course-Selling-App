@@ -1,4 +1,4 @@
-const { courseModel, purchaseModel} = require('../models/db');
+const { courseModel, purchaseModel, resourceModel} = require('../models/db');
 const {Router} = require('express')
 const { usermiddleware} = require('../middleware/user');
 const courseRouter = Router();
@@ -42,7 +42,7 @@ courseRouter.post("/purchase/:courseId", usermiddleware, async (req, res) => {
 
 courseRouter.get("/preview-courses",  async (req, res) => {
     try {
-        const allcourses = await courseModel.find({},
+        const allcourses = await resourceModel.find({},
             'title description price imageUrl '
         );
         res.status(200).json({
@@ -80,4 +80,52 @@ courseRouter.post("/particular-course/:courseId", async (req, res) => {
     })
  }
 })
+courseRouter.get("/search", async (req, res) => {
+
+  try {
+
+    const q = req.query.q?.trim();
+
+    if (!q) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query required"
+      });
+    }
+
+    const regex = new RegExp(q, "i");
+
+    const resources =
+      await resourceModel.find({
+
+      $or: [
+        { title: regex },
+        { description: regex },
+        { tags: regex }
+      ]
+
+    });
+
+    const free =
+      resources.filter(r => r.type === "free");
+
+    const external =
+      resources.filter(r => r.type === "external");
+
+    res.json({
+      success: true,
+      free,
+      external
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
+
+});
 module.exports = { courseRouter };
